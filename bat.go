@@ -308,10 +308,19 @@ func main() {
 				fmt.Println(ColorfulResponse(body, res.Header.Get("Content-Type")))
 			}
 		} else {
-			body := formatResponseBody(res, httpreq, pretty)
-			_, err = os.Stdout.WriteString(body)
-			if err != nil {
-				log.Fatal(err)
+			if printOption&printRespHeader == printRespHeader {
+				fmt.Println(res.Proto, res.Status)
+				for k, v := range res.Header {
+					fmt.Printf("%s: %s\n", k, strings.Join(v, " "))
+				}
+				fmt.Println("")
+			}
+			if printOption&printRespBody == printRespBody {
+				body := formatResponseBody(res, httpreq, pretty)
+				_, err = os.Stdout.WriteString(body)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 		}
 	} else {
