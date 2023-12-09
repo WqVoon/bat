@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -42,7 +43,20 @@ func getHTTP(method string, url string, args []string) (r *httplib.BeegoHttpRequ
 			if strs[0] == "Host" {
 				r.SetHost(strings.Join(strs[1:], ":"))
 			}
-			r.Header(strs[0], strings.Join(strs[1:], ":"))
+
+			value := strings.Join(strs[1:], ":")
+			if strings.HasPrefix(strs[1], "@") {
+				f, err := os.Open(strings.TrimLeft(strs[1], "@"))
+				if err != nil {
+					log.Fatal("Read File", strings.TrimLeft(strs[1], "@"), err)
+				}
+				content, err := io.ReadAll(f)
+				if err != nil {
+					log.Fatal("ReadAll from File", strings.TrimLeft(strs[1], "@"), err)
+				}
+				value = strings.TrimSpace(string(content))
+			}
+			r.Header(strs[0], value)
 			continue
 		}
 		// files
