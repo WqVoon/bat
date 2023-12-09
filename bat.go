@@ -61,6 +61,7 @@ var (
 	URL              = flag.String("url", "", "HTTP request URL")
 	jsonmap          map[string]interface{}
 	contentJsonRegex = `application/(.*)json`
+	bearer           = flag.String("bearer", "", "使用 flag 对应的值填充 'Authorization: Bearer xxx' 的 xxx")
 )
 
 func init() {
@@ -114,6 +115,9 @@ func main() {
 	args := flag.Args()
 	if len(args) > 0 {
 		args = filter(args)
+	}
+	if len(*bearer) != 0 {
+		args = append(args, fmt.Sprintf("Authorization:Bearer %s", *bearer))
 	}
 	if ver {
 		fmt.Println("Version:", version)
@@ -373,6 +377,7 @@ flags:
   -p, -pretty=true            Print Json Pretty Format
   -i, -insecure=false         Allow connections to SSL sites without certs
   -proxy=PROXY_URL            Proxy with host and port
+  -bearer=xxx                 使用 flag 对应的值填充 'Authorization: Bearer xxx' 的 xxx
   -print="A"                  String specifying what the output should contain, default will print all information
          "H" request headers
          "B" request body
